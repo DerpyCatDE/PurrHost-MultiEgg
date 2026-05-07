@@ -13,17 +13,16 @@ INSTALL_LOCK="/home/container/.mce_installed"
 USE_RUN_SH=false
 
 # ─── jq sicherstellen ────────────────────────────────────────
+# jq wird vom Installations-Script nach /home/container/jq kopiert
+# Falls es noch nicht im PATH ist, lokalen Pfad hinzufügen
 if ! command -v jq &>/dev/null; then
-  echo "jq nicht gefunden — wird installiert..."
-  if command -v apt-get &>/dev/null; then
-    apt-get update -qq && apt-get install -y -qq jq 2>/dev/null || true
-  elif command -v apk &>/dev/null; then
-    apk add --no-cache jq 2>/dev/null || true
-  fi
-  # Falls apt/apk nicht verfügbar oder fehlgeschlagen: jq-Binary direkt laden
-  if ! command -v jq &>/dev/null; then
+  if [ -x "/home/container/jq" ]; then
+    export PATH="/home/container:$PATH"
+  else
+    # Fallback: jq-Binary direkt laden
     curl -sSL "https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-amd64" \
-      -o /usr/local/bin/jq 2>/dev/null && chmod +x /usr/local/bin/jq 2>/dev/null || true
+      -o /home/container/jq 2>/dev/null && chmod +x /home/container/jq 2>/dev/null || true
+    export PATH="/home/container:$PATH"
   fi
 fi
 
