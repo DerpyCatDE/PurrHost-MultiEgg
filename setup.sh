@@ -15,10 +15,10 @@ INSTALL_LOCK="/home/container/.mce_installed"
 USE_RUN_SH=false
 
 # ─── Env-Variablen ───────────────────────────────────────────
-SERVER_MEMORY="${SERVER_MEMORY:-1024}"
+SERVER_MEMORY="${MC_MEMORY:-1024}"
 EXTRA_JVM_FLAGS="${EXTRA_JVM_FLAGS:-}"
 FORCE_REINSTALL="${FORCE_REINSTALL:-false}"
-EULA="${EULA:-false}"
+EULA="${MC_EULA:-false}"
 CURSEFORGE_API_KEY="${CURSEFORGE_API_KEY:-}"
 
 # ─── Wizard-Ergebnis ─────────────────────────────────────────
@@ -154,9 +154,9 @@ MC_BUILD="${MC_BUILD}"
 CURSEFORGE_MODPACK="${CURSEFORGE_MODPACK}"
 MODRINTH_MODPACK="${MODRINTH_MODPACK}"
 CURSEFORGE_API_KEY="${CURSEFORGE_API_KEY}"
-SERVER_MEMORY="${SERVER_MEMORY}"
+SERVER_MEMORY="${MC_MEMORY:-${SERVER_MEMORY}}"
 EXTRA_JVM_FLAGS="${EXTRA_JVM_FLAGS}"
-EULA="${EULA}"
+EULA="${MC_EULA:-${EULA}}"
 EOF
 }
 
@@ -464,7 +464,7 @@ wizard_confirm() {
   local needs_eula=true
   case "$W_DIST" in velocity|waterfall|bungeecord|waterdogpe) needs_eula=false ;; esac
 
-  if $needs_eula && [ "$EULA" != "true" ]; then
+  if $needs_eula && [ "$MC_EULA" != "true" ]; then
     echo -e "  ${DIM}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     warn "Du musst die Mojang EULA akzeptieren um den Server zu starten."
@@ -904,7 +904,7 @@ start_server() {
   echo -e "${G}${BOLD}  ╚═══════════════════════════════════════════════════╝${NC}"
   echo ""
 
-  [ "$EULA" = "true" ] && accept_eula
+  [ "$MC_EULA" = "true" ] && accept_eula
   cd /home/container
 
   local jvm_flags; jvm_flags=$(build_jvm_flags)
