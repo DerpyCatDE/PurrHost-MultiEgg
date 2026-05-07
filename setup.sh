@@ -249,27 +249,30 @@ wizard_version() {
   breadcrumb "Java Edition > ${W_DIST^}"
   section "Schritt 4 von 5  —  Minecraft-Version"; echo ""
   info "Bekannte Versionen: 1.21.4  •  1.21.1  •  1.20.4  •  1.20.1  •  1.19.4  •  1.16.5"
-  echo -e "  ${DIM}Eingabe ${C}latest${DIM} für die neueste Version.${NC}"; echo ""
+  echo -e "  ${DIM}Eingabe ${C}latest${DIM} fur die neueste Version.${NC}"
+  echo ""
   prompt_text "Minecraft-Version" "latest"
   W_VERSION="$TEXT_INPUT"
 
+  # Build/Loader wird immer automatisch aufgeloest
+  # Nur Forge/NeoForge/Fabric/Quilt erlauben optionale spezifische Version
   case "$W_DIST" in
-    paper|folia|waterfall|velocity|leaves)
-      clear_screen; header; breadcrumb "Java Edition > ${W_DIST^} > MC ${W_VERSION}"
-      section "Schritt 4b von 5  —  Build-Nummer"; echo ""
-      info "Eingabe ${C}latest${NC} für den aktuellen Build."; echo ""
-      prompt_text "Build-Nummer" "latest"; W_BUILD="$TEXT_INPUT" ;;
-    forge|neoforge)
-      clear_screen; header; breadcrumb "Java Edition > ${W_DIST^} > MC ${W_VERSION}"
-      section "Schritt 4b von 5  —  ${W_DIST^}-Version"; echo ""
-      info "Eingabe ${C}latest${NC} für die empfohlene Version."; echo ""
-      prompt_text "${W_DIST^}-Version" "latest"; W_BUILD="$TEXT_INPUT" ;;
-    fabric|quilt)
-      clear_screen; header; breadcrumb "Java Edition > ${W_DIST^} > MC ${W_VERSION}"
-      section "Schritt 4b von 5  —  Loader-Version"; echo ""
-      info "Eingabe ${C}latest${NC} für die neueste Version."; echo ""
-      prompt_text "${W_DIST^} Loader-Version" "latest"; W_BUILD="$TEXT_INPUT" ;;
-    *) W_BUILD="latest" ;;
+    forge|neoforge|fabric|quilt)
+      echo ""
+      info "Die neueste ${W_DIST^}-Loader-Version wird automatisch ermittelt."
+      info "Optional: Spezifische Version angeben (z.B. 47.3.0 fuer Forge)."
+      info "Einfach Enter druecken fuer automatisch."
+      echo ""
+      prompt_text "Spezifische ${W_DIST^}-Version (optional, Enter = auto)" ""
+      if [ -n "$TEXT_INPUT" ]; then
+        W_BUILD="$TEXT_INPUT"
+      else
+        W_BUILD="latest"
+      fi
+      ;;
+    *)
+      W_BUILD="latest"
+      ;;
   esac
 }
 
@@ -334,28 +337,38 @@ install_vanilla() {
 }
 
 install_paper() {
-  ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
+  # MC-Version aufloesen
+  if [ -z "$W_VERSION" ] || [ "$W_VERSION" = "latest" ]; then
+    step "Ermittle neueste Paper-Version..."
     W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/paper" | jq -r '.versions | last')
-  ( [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] ) && \
-    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/paper/versions/${W_VERSION}" | jq -r '.builds | last')
+  fi
+  # Build-Nummer immer automatisch ermitteln (neuester Build der gewaehlten Version)
+  step "Ermittle neuesten Paper-Build fuer ${W_VERSION}..."
+  W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/paper/versions/${W_VERSION}" | jq -r '.builds | last')
+  [ -z "$W_BUILD" ] || [ "$W_BUILD" = "null" ] && { err "Konnte Build-Nummer nicht ermitteln!"; exit 1; }
   info "Paper ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/paper/versions/${W_VERSION}/builds/${W_BUILD}/downloads/paper-${W_VERSION}-${W_BUILD}.jar" \
     "/home/container/server.jar" "Paper"
 }
 
 install_purpur() {
-  ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
+  if [ -z "$W_VERSION" ] || [ "$W_VERSION" = "latest" ]; then
+    step "Ermittle neueste Purpur-Version..."
     W_VERSION=$(curl -sSL "https://api.purpurmc.org/v2/purpur" | jq -r '.versions | last')
-  info "Purpur ${W_VERSION}"
+  fi
+  info "Purpur ${W_VERSION} (neuester Build)"
   download_file "https://api.purpurmc.org/v2/purpur/${W_VERSION}/latest/download" \
     "/home/container/server.jar" "Purpur ${W_VERSION}"
 }
 
 install_folia() {
-  ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
+  if [ -z "$W_VERSION" ] || [ "$W_VERSION" = "latest" ]; then
+    step "Ermittle neueste Folia-Version..."
     W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/folia" | jq -r '.versions | last')
-  ( [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] ) && \
-    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/folia/versions/${W_VERSION}" | jq -r '.builds | last')
+  fi
+  step "Ermittle neuesten Folia-Build fuer ${W_VERSION}..."
+  W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/folia/versions/${W_VERSION}" | jq -r '.builds | last')
+  [ -z "$W_BUILD" ] || [ "$W_BUILD" = "null" ] && { err "Konnte Build-Nummer nicht ermitteln!"; exit 1; }
   info "Folia ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/folia/versions/${W_VERSION}/builds/${W_BUILD}/downloads/folia-${W_VERSION}-${W_BUILD}.jar" \
     "/home/container/server.jar" "Folia"
@@ -376,10 +389,13 @@ install_pufferfish() {
 }
 
 install_leaves() {
-  ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
+  if [ -z "$W_VERSION" ] || [ "$W_VERSION" = "latest" ]; then
+    step "Ermittle neueste Leaves-Version..."
     W_VERSION=$(curl -sSL "https://api.leavesmc.org/v2/projects/leaves" | jq -r '.versions | last' 2>/dev/null || echo "1.21")
-  ( [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] ) && \
-    W_BUILD=$(curl -sSL "https://api.leavesmc.org/v2/projects/leaves/versions/${W_VERSION}" | jq -r '.builds | last' 2>/dev/null || echo "latest")
+  fi
+  step "Ermittle neuesten Leaves-Build fuer ${W_VERSION}..."
+  W_BUILD=$(curl -sSL "https://api.leavesmc.org/v2/projects/leaves/versions/${W_VERSION}" | jq -r '.builds | last' 2>/dev/null || echo "")
+  [ -z "$W_BUILD" ] || [ "$W_BUILD" = "null" ] && { err "Konnte Build-Nummer nicht ermitteln!"; exit 1; }
   info "Leaves ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.leavesmc.org/v2/projects/leaves/versions/${W_VERSION}/builds/${W_BUILD}/downloads/leaves-${W_VERSION}-${W_BUILD}.jar" \
     "/home/container/server.jar" "Leaves"
@@ -397,20 +413,26 @@ install_spigot() {
 }
 
 install_velocity() {
-  ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
+  if [ -z "$W_VERSION" ] || [ "$W_VERSION" = "latest" ]; then
+    step "Ermittle neueste Velocity-Version..."
     W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/velocity" | jq -r '.versions | last')
-  ( [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] ) && \
-    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/velocity/versions/${W_VERSION}" | jq -r '.builds | last')
+  fi
+  step "Ermittle neuesten Velocity-Build fuer ${W_VERSION}..."
+  W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/velocity/versions/${W_VERSION}" | jq -r '.builds | last')
+  [ -z "$W_BUILD" ] || [ "$W_BUILD" = "null" ] && { err "Konnte Build-Nummer nicht ermitteln!"; exit 1; }
   info "Velocity ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/velocity/versions/${W_VERSION}/builds/${W_BUILD}/downloads/velocity-${W_VERSION}-${W_BUILD}.jar" \
     "/home/container/server.jar" "Velocity"
 }
 
 install_waterfall() {
-  ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
+  if [ -z "$W_VERSION" ] || [ "$W_VERSION" = "latest" ]; then
+    step "Ermittle neueste Waterfall-Version..."
     W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/waterfall" | jq -r '.versions | last')
-  ( [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] ) && \
-    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/waterfall/versions/${W_VERSION}" | jq -r '.builds | last')
+  fi
+  step "Ermittle neuesten Waterfall-Build fuer ${W_VERSION}..."
+  W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/waterfall/versions/${W_VERSION}" | jq -r '.builds | last')
+  [ -z "$W_BUILD" ] || [ "$W_BUILD" = "null" ] && { err "Konnte Build-Nummer nicht ermitteln!"; exit 1; }
   info "Waterfall ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/waterfall/versions/${W_VERSION}/builds/${W_BUILD}/downloads/waterfall-${W_VERSION}-${W_BUILD}.jar" \
     "/home/container/server.jar" "Waterfall"
