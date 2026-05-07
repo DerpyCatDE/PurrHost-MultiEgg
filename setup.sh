@@ -493,33 +493,33 @@ wizard_confirm() {
 # ════════════════════════════════════════════════════════════
 
 install_vanilla() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(get_latest_mc_version)
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(get_latest_mc_version)
   info "Vanilla ${W_VERSION}"
   download_file "$(get_mc_server_url "$W_VERSION")" "/home/container/server.jar" "Vanilla ${W_VERSION}"
 }
 
 install_paper() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/paper" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])")
-  [ "$W_BUILD"   = "latest" ] && W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/paper/versions/${W_VERSION}" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['builds'][-1])")
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/paper" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])")
+  [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] && W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/paper/versions/${W_VERSION}" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['builds'][-1])")
   info "Paper ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/paper/versions/${W_VERSION}/builds/${W_BUILD}/downloads/paper-${W_VERSION}-${W_BUILD}.jar" "/home/container/server.jar" "Paper"
 }
 
 install_purpur() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(curl -sSL "https://api.purpurmc.org/v2/purpur" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])")
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(curl -sSL "https://api.purpurmc.org/v2/purpur" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])")
   info "Purpur ${W_VERSION}"
   download_file "https://api.purpurmc.org/v2/purpur/${W_VERSION}/latest/download" "/home/container/server.jar" "Purpur ${W_VERSION}"
 }
 
 install_folia() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/folia" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])")
-  [ "$W_BUILD"   = "latest" ] && W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/folia/versions/${W_VERSION}" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['builds'][-1])")
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/folia" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])")
+  [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] && W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/folia/versions/${W_VERSION}" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['builds'][-1])")
   info "Folia ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/folia/versions/${W_VERSION}/builds/${W_BUILD}/downloads/folia-${W_VERSION}-${W_BUILD}.jar" "/home/container/server.jar" "Folia"
 }
 
 install_pufferfish() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(get_latest_mc_version)
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(get_latest_mc_version)
   info "Pufferfish ${W_VERSION}"
   local ci_base="https://ci.pufferfish.host/job/Pufferfish-${W_VERSION}/lastSuccessfulBuild/artifact/build/libs/"
   local jar_file
@@ -533,14 +533,14 @@ install_pufferfish() {
 }
 
 install_leaves() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(curl -sSL "https://api.leavesmc.org/v2/projects/leaves" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])" 2>/dev/null || echo "1.21")
-  [ "$W_BUILD"   = "latest" ] && W_BUILD=$(curl -sSL "https://api.leavesmc.org/v2/projects/leaves/versions/${W_VERSION}" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['builds'][-1])" 2>/dev/null || echo "latest")
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(curl -sSL "https://api.leavesmc.org/v2/projects/leaves" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])" 2>/dev/null || echo "1.21")
+  [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] && W_BUILD=$(curl -sSL "https://api.leavesmc.org/v2/projects/leaves/versions/${W_VERSION}" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['builds'][-1])" 2>/dev/null || echo "latest")
   info "Leaves ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.leavesmc.org/v2/projects/leaves/versions/${W_VERSION}/builds/${W_BUILD}/downloads/leaves-${W_VERSION}-${W_BUILD}.jar" "/home/container/server.jar" "Leaves"
 }
 
 install_spigot() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(get_latest_mc_version)
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(get_latest_mc_version)
   info "Baue Spigot ${W_VERSION} via BuildTools (kann mehrere Minuten dauern)..."
   mkdir -p /tmp/spigot_build && cd /tmp/spigot_build
   download_file "https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar" "BuildTools.jar" "BuildTools"
@@ -551,15 +551,15 @@ install_spigot() {
 }
 
 install_velocity() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/velocity" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])")
-  [ "$W_BUILD"   = "latest" ] && W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/velocity/versions/${W_VERSION}" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['builds'][-1])")
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/velocity" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])")
+  [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] && W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/velocity/versions/${W_VERSION}" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['builds'][-1])")
   info "Velocity ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/velocity/versions/${W_VERSION}/builds/${W_BUILD}/downloads/velocity-${W_VERSION}-${W_BUILD}.jar" "/home/container/server.jar" "Velocity"
 }
 
 install_waterfall() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/waterfall" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])")
-  [ "$W_BUILD"   = "latest" ] && W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/waterfall/versions/${W_VERSION}" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['builds'][-1])")
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/waterfall" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['versions'][-1])")
+  [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] && W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/waterfall/versions/${W_VERSION}" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['builds'][-1])")
   info "Waterfall ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/waterfall/versions/${W_VERSION}/builds/${W_BUILD}/downloads/waterfall-${W_VERSION}-${W_BUILD}.jar" "/home/container/server.jar" "Waterfall"
 }
@@ -570,7 +570,7 @@ install_bungeecord() {
 }
 
 install_forge() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(get_latest_mc_version)
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(get_latest_mc_version)
   local forge_ver="$W_BUILD"
   if [ "$forge_ver" = "latest" ]; then
     forge_ver=$(curl -sSL "https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json" | python3 -c "
@@ -594,7 +594,7 @@ print(v)")
 }
 
 install_neoforge() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(get_latest_mc_version)
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(get_latest_mc_version)
   local neo_mc="${W_VERSION#1.}"
   local neo_ver="$W_BUILD"
   if [ "$neo_ver" = "latest" ]; then
@@ -651,7 +651,7 @@ print(s[0] if s else d[0]['version'])")
 }
 
 install_sponge() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(get_latest_mc_version)
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(get_latest_mc_version)
   info "SpongeVanilla ${W_VERSION}"
   local dl_url
   dl_url=$(curl -sSL "https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=minecraft:${W_VERSION}&limit=1" | python3 -c "
@@ -666,7 +666,7 @@ if items:
 }
 
 install_mohist() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION=$(curl -sSL "https://mohistmc.com/api/v2/projects/mohist" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('versions',[])[-1])" 2>/dev/null || echo "1.20.1")
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION=$(curl -sSL "https://mohistmc.com/api/v2/projects/mohist" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('versions',[])[-1])" 2>/dev/null || echo "1.20.1")
   local build
   build=$(curl -sSL "https://mohistmc.com/api/v2/projects/mohist/${W_VERSION}/builds" | python3 -c "
 import json,sys; d=json.load(sys.stdin); b=d.get('builds',[])
@@ -676,7 +676,7 @@ print(b[-1].get('number','latest') if b else 'latest')" 2>/dev/null || echo "lat
 }
 
 install_arclight() {
-  [ "$W_VERSION" = "latest" ] && W_VERSION="1.20.1"
+  [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] && W_VERSION="1.20.1"
   info "Arclight ${W_VERSION}"
   local dl_url
   dl_url=$(curl -sSL "https://api.github.com/repos/IzzelAliz/Arclight/releases/latest" | python3 -c "
