@@ -335,9 +335,9 @@ install_vanilla() {
 
 install_paper() {
   ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
-    W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/paper" | jq -r '.versions[-1]')
+    W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/paper" | jq -r '.versions | last')
   ( [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] ) && \
-    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/paper/versions/${W_VERSION}" | jq -r '.builds[-1]')
+    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/paper/versions/${W_VERSION}" | jq -r '.builds | last')
   info "Paper ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/paper/versions/${W_VERSION}/builds/${W_BUILD}/downloads/paper-${W_VERSION}-${W_BUILD}.jar" \
     "/home/container/server.jar" "Paper"
@@ -345,7 +345,7 @@ install_paper() {
 
 install_purpur() {
   ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
-    W_VERSION=$(curl -sSL "https://api.purpurmc.org/v2/purpur" | jq -r '.versions[-1]')
+    W_VERSION=$(curl -sSL "https://api.purpurmc.org/v2/purpur" | jq -r '.versions | last')
   info "Purpur ${W_VERSION}"
   download_file "https://api.purpurmc.org/v2/purpur/${W_VERSION}/latest/download" \
     "/home/container/server.jar" "Purpur ${W_VERSION}"
@@ -353,9 +353,9 @@ install_purpur() {
 
 install_folia() {
   ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
-    W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/folia" | jq -r '.versions[-1]')
+    W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/folia" | jq -r '.versions | last')
   ( [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] ) && \
-    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/folia/versions/${W_VERSION}" | jq -r '.builds[-1]')
+    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/folia/versions/${W_VERSION}" | jq -r '.builds | last')
   info "Folia ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/folia/versions/${W_VERSION}/builds/${W_BUILD}/downloads/folia-${W_VERSION}-${W_BUILD}.jar" \
     "/home/container/server.jar" "Folia"
@@ -377,9 +377,9 @@ install_pufferfish() {
 
 install_leaves() {
   ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
-    W_VERSION=$(curl -sSL "https://api.leavesmc.org/v2/projects/leaves" | jq -r '.versions[-1]' 2>/dev/null || echo "1.21")
+    W_VERSION=$(curl -sSL "https://api.leavesmc.org/v2/projects/leaves" | jq -r '.versions | last' 2>/dev/null || echo "1.21")
   ( [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] ) && \
-    W_BUILD=$(curl -sSL "https://api.leavesmc.org/v2/projects/leaves/versions/${W_VERSION}" | jq -r '.builds[-1]' 2>/dev/null || echo "latest")
+    W_BUILD=$(curl -sSL "https://api.leavesmc.org/v2/projects/leaves/versions/${W_VERSION}" | jq -r '.builds | last' 2>/dev/null || echo "latest")
   info "Leaves ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.leavesmc.org/v2/projects/leaves/versions/${W_VERSION}/builds/${W_BUILD}/downloads/leaves-${W_VERSION}-${W_BUILD}.jar" \
     "/home/container/server.jar" "Leaves"
@@ -398,9 +398,9 @@ install_spigot() {
 
 install_velocity() {
   ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
-    W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/velocity" | jq -r '.versions[-1]')
+    W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/velocity" | jq -r '.versions | last')
   ( [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] ) && \
-    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/velocity/versions/${W_VERSION}" | jq -r '.builds[-1]')
+    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/velocity/versions/${W_VERSION}" | jq -r '.builds | last')
   info "Velocity ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/velocity/versions/${W_VERSION}/builds/${W_BUILD}/downloads/velocity-${W_VERSION}-${W_BUILD}.jar" \
     "/home/container/server.jar" "Velocity"
@@ -408,9 +408,9 @@ install_velocity() {
 
 install_waterfall() {
   ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
-    W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/waterfall" | jq -r '.versions[-1]')
+    W_VERSION=$(curl -sSL "https://api.papermc.io/v2/projects/waterfall" | jq -r '.versions | last')
   ( [ "$W_BUILD" = "latest" ] || [ -z "$W_BUILD" ] ) && \
-    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/waterfall/versions/${W_VERSION}" | jq -r '.builds[-1]')
+    W_BUILD=$(curl -sSL "https://api.papermc.io/v2/projects/waterfall/versions/${W_VERSION}" | jq -r '.builds | last')
   info "Waterfall ${W_VERSION} Build ${W_BUILD}"
   download_file "https://api.papermc.io/v2/projects/waterfall/versions/${W_VERSION}/builds/${W_BUILD}/downloads/waterfall-${W_VERSION}-${W_BUILD}.jar" \
     "/home/container/server.jar" "Waterfall"
@@ -510,9 +510,9 @@ install_sponge() {
 
 install_mohist() {
   ( [ "$W_VERSION" = "latest" ] || [ -z "$W_VERSION" ] ) && \
-    W_VERSION=$(curl -sSL "https://mohistmc.com/api/v2/projects/mohist" | jq -r '.versions[-1]' 2>/dev/null || echo "1.20.1")
+    W_VERSION=$(curl -sSL "https://mohistmc.com/api/v2/projects/mohist" | jq -r '.versions | last' 2>/dev/null || echo "1.20.1")
   local build
-  build=$(curl -sSL "https://mohistmc.com/api/v2/projects/mohist/${W_VERSION}/builds" | jq -r '.builds[-1].number' 2>/dev/null || echo "latest")
+  build=$(curl -sSL "https://mohistmc.com/api/v2/projects/mohist/${W_VERSION}/builds" | jq -r '.builds | last | .number' 2>/dev/null || echo "latest")
   info "Mohist ${W_VERSION} Build ${build}"
   download_file "https://mohistmc.com/api/v2/projects/mohist/${W_VERSION}/builds/${build}/download" \
     "/home/container/server.jar" "Mohist"
@@ -635,7 +635,7 @@ install_modrinth_modpack() {
   fi
   local file_url mc_ver loader
   file_url=$(echo "$version_data" | jq -r '.files[] | select(.primary==true or (.filename | endswith(".mrpack"))) | .url' | head -1)
-  mc_ver=$(echo "$version_data" | jq -r '.game_versions[-1]')
+  mc_ver=$(echo "$version_data" | jq -r '.game_versions | last')
   loader=$(echo "$version_data" | jq -r '.loaders[0]')
   info "MC ${mc_ver} / Loader ${loader}"
   mkdir -p /home/container/tmp_mr && cd /home/container/tmp_mr
